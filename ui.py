@@ -33,10 +33,15 @@ def image_extraction(original_file_source):
         sys.exit(1)
 
     with zipfile.ZipFile(dst_source, "r") as zip_ref:
-        zip_ref.extractall("./Image Dump")
+        zip_ref.extractall("./Program Data")
+
+    # File clean up at the end
     os.remove(dst_source)
-    shutil.move("./Image Dump/word/media", "./")
-    os.remove("./Image Dump")
+    try:
+        shutil.copytree("./Program Data/word/media", "./Images")
+    except FileExistsError:
+        shutil.rmtree("./Images")
+        shutil.copytree("./Program Data/word/media", "./Images")
 
 
 root = tk.Tk()
