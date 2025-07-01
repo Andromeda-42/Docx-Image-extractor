@@ -108,12 +108,8 @@ label1 = ttk.Label(
 )
 label1.pack(side="top", anchor="w", padx=20)
 
-button1 = ttk.Button(text="Open Word Document File", command=open_file_dialog)
+button1 = ttk.Button(text="Open Word Document or PDF", command=open_file_dialog)
 button1.config(width=30)
 button1.pack(side="top", pady=20, ipady=5)
-
-button2 = ttk.Button(text="Open PDF ", command=open_file_dialog)
-button2.config(width=30)
-button2.pack(side="top", pady=20, ipady=5)
 
 root.mainloop()
