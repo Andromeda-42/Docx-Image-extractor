@@ -6,6 +6,7 @@ import zipfile
 import sys
 import tkinter as tk
 from pathlib import Path
+import zipfile
 from pypdf import PdfReader
 from tkinter import ttk
 from tkinter import filedialog
@@ -24,28 +25,32 @@ def open_file_dialog():
 
 def docx_image_extraction(original_file_source):
     """Strips the images out of a docx file by converting to .zip extracting and moving the image source folder to the forefront"""
-    try:
-        source_no_extension, old_extension = original_file_source.split(".")
 
-        new_extension = ".zip"
+    # Ensure the output folder exists
+    os.makedirs("./pics", exist_ok=True)
 
-        dst_source = source_no_extension + new_extension
+    # Open the .docx file as a zip archive
+    with zipfile.ZipFile(original_file_source, "r") as docx_zip:
+        # List all files in the archive
+        all_files = docx_zip.namelist()
 
-        shutil.copy(original_file_source, dst_source)
-    except FileNotFoundError:
-        print("You Goofed")
-        sys.exit(1)
+        # Filter for image files (usually in 'word/media/')
+        image_files = [f for f in all_files if f.startswith("word/media/")]
 
-    with zipfile.ZipFile(dst_source, "r") as zip_ref:
-        zip_ref.extractall("./Program Data")
+        # Extract and save each image
+        for image_file in image_files:
+            image_data = docx_zip.read(image_file)
+            image_name = os.path.basename(image_file)
+            output_path = os.path.join("./pics", image_name)
 
-    # File clean up at the end
-    os.remove(dst_source)
-    try:
-        shutil.copytree("./Program Data/word/media", "./Images")
-    except FileExistsError:
-        shutil.rmtree("./Images")
-        shutil.copytree("./Program Data/word/media", "./Images")
+            with open(output_path, "wb") as f:
+                f.write(image_data)
+
+        print(f"Extracted {len(image_files)} images to pics.")
+
+
+# Example usage
+# extract_images_from_docx("example.docx", "output_images")
 
 
 def pdf_image_extraction(pdf_path):
